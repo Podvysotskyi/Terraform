@@ -47,97 +47,104 @@ resource "docker_container" "traefik_docker_container" {
   privileged        = false
   publish_all_ports = false
 
-  ports = [
-    {
-      internal = 80
-      external = 80
-      protocol = "tcp"
-    },
-    {
-      internal = 443
-      external = 443
-      protocol = "tcp"
-    }
-  ]
+  ports {
+    internal = 80
+    external = 80
+    protocol = "tcp"
+  }
 
-  volumes = [
-    {
-      container_path = "/var/run/docker.sock"
-      host_path      = "/var/run/docker.sock"
-      read_only      = true
-    },
-    {
-      container_path = "/letsencrypt"
-      volume_name    = docker_volume.letsencrypt_docker_volume.name
-    },
-    {
-      container_path = "/etc/traefik"
-      volume_name    = docker_volume.config_docker_volume.name
-    },
-  ]
+  ports {
+    internal = 443
+    external = 443
+    protocol = "tcp"
+  }
 
-  networks_advanced = [
-    {
-      name = docker_network.traefik_docker_network.name
-    }
-  ]
+  volumes {
+    container_path = "/var/run/docker.sock"
+    host_path      = "/var/run/docker.sock"
+    read_only      = true
+  }
 
-  labels = [
-    {
-      key   = "traefik.enable"
-      value = "true"
-    },
-    {
-      key   = "traefik.docker.network"
-      value = docker_network.traefik_docker_network.name
-    },
-    # WEB
-    {
-      key   = "traefik.http.routers.traefik-web.entrypoints"
-      value = "web"
-    },
-    {
-      key   = "traefik.http.routers.traefik-web.rule"
-      value = "Host(`traefik.${var.CLOUDFLARE_DOMAIN}`)"
-    },
-    {
-      key   = "traefik.http.routers.traefik-web.service"
-      value = "traefik-web"
-    },
-    {
-      key   = "traefik.http.services.traefik-web.loadbalancer.server.port"
-      value = "8080"
-    },
-    {
-      key   = "traefik.http.services.traefik-web.loadbalancer.server.scheme"
-      value = "http"
-    },
-    {
-      key   = "traefik.http.services.traefik-web.loadbalancer.passhostheader"
-      value = "true"
-    },
-    {
-      key   = "traefik.http.routers.traefik-web.middlewares"
-      value = "https-redirect"
-    },
-    # WEBSECURE
-    {
-      key   = "traefik.http.routers.traefik-websecure.entrypoints"
-      value = "websecure"
-    },
-    {
-      key   = "traefik.http.routers.traefik-websecure.rule"
-      value = "Host(`traefik.${var.CLOUDFLARE_DOMAIN}`)"
-    },
-    {
-      key   = "traefik.http.routers.traefik-websecure.tls.certResolver"
-      value = "cloudflare"
-    },
-    {
-      key   = "traefik.http.routers.traefik-websecure.service"
-      value = "traefik-web"
-    }
-  ]
+  volumes {
+    container_path = "/letsencrypt"
+    volume_name    = docker_volume.letsencrypt_docker_volume.name
+  }
+
+  volumes {
+    container_path = "/etc/traefik"
+    volume_name    = docker_volume.config_docker_volume.name
+  }
+
+  networks_advanced {
+    name = docker_network.traefik_docker_network.name
+  }
+
+  labels {
+    label = "traefik.enable"
+    value = "true"
+  }
+
+  labels {
+    label = "traefik.docker.network"
+    value = docker_network.traefik_docker_network.name
+  }
+
+  # WEB
+  labels {
+    label = "traefik.http.routers.traefik-web.entrypoints"
+    value = "web"
+  }
+
+  labels {
+    label = "traefik.http.routers.traefik-web.rule"
+    value = "Host(`traefik.${var.CLOUDFLARE_DOMAIN}`)"
+  }
+
+  labels {
+    label = "traefik.http.routers.traefik-web.service"
+    value = "traefik-web"
+  }
+
+  labels {
+    label = "traefik.http.services.traefik-web.loadbalancer.server.port"
+    value = "8080"
+  }
+
+  labels {
+    label = "traefik.http.services.traefik-web.loadbalancer.server.scheme"
+    value = "http"
+  }
+
+  labels {
+    label = "traefik.http.services.traefik-web.loadbalancer.passhostheader"
+    value = "true"
+  }
+
+  labels {
+    label = "traefik.http.routers.traefik-web.middlewares"
+    value = "https-redirect"
+  }
+
+  # WEBSECURE
+  labels {
+    label = "traefik.http.routers.traefik-websecure.entrypoints"
+    value = "websecure"
+  }
+
+  labels {
+    label = "traefik.http.routers.traefik-websecure.rule"
+    value = "Host(`traefik.${var.CLOUDFLARE_DOMAIN}`)"
+  }
+
+  labels {
+    label = "traefik.http.routers.traefik-websecure.tls.certResolver"
+    value = "cloudflare"
+  }
+
+  labels {
+    label = "traefik.http.routers.traefik-websecure.service"
+    value = "traefik-web"
+  }
 
   env = [
     "CLOUDFLARE_DNS_API_TOKEN=${var.CLOUDFLARE_TOKEN}",
