@@ -1,0 +1,9 @@
+module "traefik" {
+  source = "./traefik"
+
+  DOCKER_HOST = var.HETZNER_IP
+
+  CLOUDFLARE_DOMAIN = var.CLOUDFLARE_DOMAIN
+  CLOUDFLARE_EMAIL  = var.CLOUDFLARE_EMAIL
+  CLOUDFLARE_TOKEN  = var.CLOUDFLARE_TOKEN
+}
