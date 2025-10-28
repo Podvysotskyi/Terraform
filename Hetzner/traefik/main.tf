@@ -18,7 +18,7 @@ resource "docker_volume" "config_docker_volume" {
 }
 
 resource "docker_container" "traefik_docker_container" {
-  image    = traefik_docker_image.image.image_id
+  image    = docker_image.traefik_docker_image.image_id
   name     = "traefik"
   hostname = "traefik"
   must_run = true
@@ -68,17 +68,17 @@ resource "docker_container" "traefik_docker_container" {
     },
     {
       container_path = "/letsencrypt"
-      volume_name    = letsencrypt_docker_volume.volume.name
+      volume_name    = docker_volume.letsencrypt_docker_volume.name
     },
     {
       container_path = "/etc/traefik"
-      volume_name    = config_docker_volume.volume.name
+      volume_name    = docker_volume.config_docker_volume.name
     },
   ]
 
   networks_advanced = [
     {
-      name = traefik_docker_network.network.name
+      name = docker_network.traefik_docker_network.name
     }
   ]
 
@@ -89,7 +89,7 @@ resource "docker_container" "traefik_docker_container" {
     },
     {
       key   = "traefik.docker.network"
-      value = traefik_docker_network.network.name
+      value = docker_network.traefik_docker_network.name
     },
     # WEB
     {
